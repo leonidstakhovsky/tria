@@ -1,0 +1,107 @@
+apiVersion: kops.k8s.io/v1alpha2
+Kind: Cluster
+metadata:
+  creationTimestamp: "2020-01-06T11:23:24Z"
+  name: gsuite.pp.ua
+spec:
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    alwaysAllow: {}
+  channel: stable
+  cloudLabels:
+    Project: K8S_KOPS_trian
+    owner: Leonid
+  cloudProvider: aws
+  configBase: s3://kops-bucket-l2net/gsuite.pp.ua
+  etcdClusters:
+  - cpuRequest: 200m
+    etcdMembers:
+    - instanceGroup: master-ca-central-1a
+      name: a
+    memoryRequest: 100Mi
+    name: main
+  - cpuRequest: 100m
+    etcdMembers:
+    - instanceGroup: master-ca-central-1a
+      name: a
+    memoryRequest: 100Mi
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubelet:
+    anonymousAuth: false
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: 1.15.6
+  masterPublicName: api.gsuite.pp.ua
+  networkCIDR: 10.0.0.0/16
+  networkID: vpc-0aedf8a57b83a0913
+  networking:
+    weave:
+      mtu: 8912
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - cidr: 10.0.10.0/24
+    id: subnet-0db4eea8f176643b7
+    name: ca-central-1a
+    type: Public
+    zone: ca-central-1a
+  - cidr: 10.0.20.0/24
+    id: subnet-0b47f4596a735e796
+    name: Utility-ca-central-1a
+    type: Utility
+    zone: ca-central-1a
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+Kind: InstanceGroup
+metadata:
+  creationTimestamp: "2020-01-06T11:23:24Z"
+  generation: 1
+  labels:
+    kops.k8s.io/cluster: gsuite.pp.ua
+  name: master-ca-central-1a
+spec:
+#  image: ami-0b85d4ff00de6a225
+  machineType: t2.micro
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-ca-central-1a
+  role: Master
+  rootVolumeSize: 20
+  subnets:
+  - ca-central-1a
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+Kind: InstanceGroup
+metadata:
+  creationTimestamp: "2020-01-06T11:23:24Z"
+  generation: 1
+  labels:
+    kops.k8s.io/cluster: gsuite.pp.ua
+  name: nodes
+spec:
+#  image: ami-0b85d4ff00de6a225
+  machineType: t2.micro
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
+  role: Node
+  rootVolumeSize: 20
+  subnets:
+  - Utility-ca-central-1a
